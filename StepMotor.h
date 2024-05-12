@@ -20,11 +20,18 @@ public:
 	uint32_t m_counterSteps;
 
 private:
+
 	enum TYPE_MOTION{
 		NO_MOTION = 0,
 		ACCELERATION = 1,
 		MOTION = 2,
-		BRACKING = 3
+		BRACKING = 3,
+		ERROR = 4
+	};
+
+	enum TYPE_MOTOR_CONTROL{
+		DC_MOTOR = 0,
+		STEP_MOTOR = 1
 	};
 
 	private:
@@ -37,6 +44,8 @@ private:
 
 	TIM_HandleTypeDef *p_htim_PWM;
 
+	TYPE_MOTOR_CONTROL typeMotorControl;
+
 	uint32_t m_Channel;
 	bool m_direction;
 	uint32_t m_nStepsForMotion;
@@ -48,20 +57,17 @@ private:
 	uint32_t m_stepStartBrake;
 	uint32_t m_OneStepBrake;
 	uint32_t m_OneStepAcceleration;
-	TYPE_MOTION typeMotion;
+	TYPE_MOTION m_typeMotion;
 	uint32_t m_stepFreqAcceleration;
 	uint32_t m_stepFreqBrake;
 	uint32_t m_stepsAcceleration;
 	uint32_t m_stepsBrake;
 
 	public:
-	void calculateFreqBrakeStep();
-	void calculateFreqAccelerationStep();
 	void setDirection(uint8_t direction);
 	void checkMotorInCallback(TIM_HandleTypeDef *htim);
 	inline uint8_t getDirection();
-	void startMotion(uint32_t steps);
-	void accelerationService(uint32_t i);
+	void startMotion(uint32_t steps, uint32_t maxSpeed, uint8_t procentAccelBrake,  uint16_t nStepsAccelBrake);
 	void setMaxSpeed(uint32_t speed);
 	uint32_t getSpeed();
 	void setAccelerationStep(uint32_t step,  uint32_t stepEndAccep);
@@ -71,13 +77,17 @@ private:
 	uint32_t getMinSpeed();
 	void setRetention(bool);
 	void setBrakeMotorStep(uint32_t stepsBrake, uint32_t pointStartBraking);
-	void brakeService(uint32_t i);
 	void stopMotion();
-
-
+	inline int getMotorState();
+	void startDC_Motion(uint16_t nSteps, uint16_t stepsInOneAccelStep);
 
 	private:
+	void calculateFreqBrakeStep();
+	void calculateFreqAccelerationStep();
+	void accelerationService();
 	void motorService();
+	void brakeService();
+	void accelerationDCService(uint16_t stepsAccelerate, uint32_t stepMotorInStepAccel);
 };
 
 
